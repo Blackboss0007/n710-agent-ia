@@ -1,5 +1,7 @@
 # N710 AI Sales Agent
 
+Repositorio GitHub: [https://github.com/Blackboss0007/n710-agent-ia](https://github.com/Blackboss0007/n710-agent-ia)
+
 SaaS multi-tenant para empresas configurarem um vendedor digital de IA com Supabase, OpenAI, webhooks de pagamento e atendimento via WhatsApp.
 
 ## Stack
@@ -279,7 +281,7 @@ O endpoint:
 ## Deploy na Vercel
 
 1. Suba o projeto para o GitHub.
-2. Crie um projeto na Vercel e conecte o repositório.
+2. Crie um projeto na Vercel e conecte o repositorio.
 3. Em `Project Settings -> Environment Variables`, adicione:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -288,7 +290,7 @@ O endpoint:
    - `CAKTO_WEBHOOK_SECRET`
    - `WHATSAPP_WEBHOOK_SECRET`
    - `NEXT_PUBLIC_APP_URL=https://meu-dominio.com`
-4. Faça o deploy.
+4. Faca o deploy.
 5. Atualize no Supabase:
    - `Site URL`
    - `Redirect URLs`
@@ -315,7 +317,7 @@ O endpoint:
 2. Va em `/register`
 3. Crie a conta
 4. Confirme o email, se o seu projeto estiver exigindo confirmacao
-5. Faça login
+5. Faca login
 6. Complete o onboarding
 7. Acesse o dashboard
 
