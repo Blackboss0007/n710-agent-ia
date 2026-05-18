@@ -1,14 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireOrganization } from "@/lib/dashboard/queries";
+import { FALLBACK_ORGANIZATION_ID, requireOrganization } from "@/lib/dashboard/queries";
 
 const fallbackPrompt =
   "Voce e um vendedor digital profissional da empresa {{company_name}}. Seu objetivo e atender leads, responder duvidas, qualificar oportunidades, quebrar objecoes e conduzir o cliente para agendamento ou compra. Seja claro, humano, objetivo e persuasivo. Nunca invente informacoes. Quando nao souber responder, encaminhe para atendimento humano.";
 
 export async function saveAgentAction(formData: FormData) {
-  const { supabase, organization } = await requireOrganization();
+  const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return;
+  if (schemaIssue || organization.id === FALLBACK_ORGANIZATION_ID) {
+    revalidatePath("/dashboard/agent");
+    return;
+  }
 
   const agentId = getValue(formData, "agent_id");
   const payload = {

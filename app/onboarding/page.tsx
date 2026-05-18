@@ -19,16 +19,7 @@ export default async function OnboardingPage() {
   const { organization, profile, schemaIssue } = await getTenantContext();
 
   if (schemaIssue) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-12">
-        <SetupAlert
-          title="Schema do Supabase pendente"
-          description="O onboarding depende das tabelas principais do SaaS. Assim que o schema de producao for executado, esta tela volta a funcionar normalmente."
-          missing={[schemaIssue, "Execute supabase/schema.sql no Supabase de producao."]}
-          detailsLabel="Pendencias:"
-        />
-      </main>
-    );
+    redirect("/dashboard");
   }
 
   if (!organization) {

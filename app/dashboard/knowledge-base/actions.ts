@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireOrganization } from "@/lib/dashboard/queries";
+import { FALLBACK_ORGANIZATION_ID, requireOrganization } from "@/lib/dashboard/queries";
 
 const categories = [
   "company",
@@ -15,8 +15,12 @@ const categories = [
 ];
 
 export async function saveKnowledgeBaseAction(formData: FormData) {
-  const { supabase, organization } = await requireOrganization();
+  const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return;
+  if (schemaIssue || organization.id === FALLBACK_ORGANIZATION_ID) {
+    revalidatePath("/dashboard/knowledge-base");
+    return;
+  }
 
   const agentId = getValue(formData, "agent_id") || null;
 
@@ -49,8 +53,12 @@ export async function saveKnowledgeBaseAction(formData: FormData) {
 }
 
 export async function addQuestionAnswerAction(formData: FormData) {
-  const { supabase, organization } = await requireOrganization();
+  const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return;
+  if (schemaIssue || organization.id === FALLBACK_ORGANIZATION_ID) {
+    revalidatePath("/dashboard/knowledge-base");
+    return;
+  }
 
   const question = getValue(formData, "question");
   const answer = getValue(formData, "answer");
@@ -75,8 +83,12 @@ export async function addQuestionAnswerAction(formData: FormData) {
 }
 
 export async function uploadKnowledgeDocumentAction(formData: FormData) {
-  const { supabase, organization } = await requireOrganization();
+  const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return;
+  if (schemaIssue || organization.id === FALLBACK_ORGANIZATION_ID) {
+    revalidatePath("/dashboard/knowledge-base");
+    return;
+  }
 
   const file = formData.get("file");
   const agentId = getValue(formData, "agent_id") || null;

@@ -81,6 +81,8 @@ type TenantContext = {
   schemaIssue: string | null;
 };
 
+const FALLBACK_ORGANIZATION_ID = "fallback-organization";
+
 function isSchemaCacheError(message?: string | null) {
   return Boolean(message && /Could not find the table|schema cache/i.test(message));
 }
@@ -124,11 +126,21 @@ export async function getTenantContext() {
     ? membership?.organizations[0]
     : membership?.organizations;
 
+  const fallbackOrganization: Organization = {
+    id: FALLBACK_ORGANIZATION_ID,
+    name: profile?.full_name ? `${profile.full_name} - Organizacao` : "Minha organizacao",
+    slug: "fallback",
+    segment: "Configuracao inicial",
+    website: null,
+    whatsapp_phone: null,
+    metadata: { onboarding_completed: true }
+  };
+
   return {
     supabase,
     user,
     profile: profile ?? null,
-    organization: (organization ?? null) as Organization | null,
+    organization: ((organization ?? null) || (schemaIssue ? fallbackOrganization : null)) as Organization | null,
     role: membership?.role as string | null,
     schemaIssue: normalizeSchemaIssue(schemaIssue)
   } satisfies TenantContext;
@@ -211,8 +223,9 @@ export async function getDashboardData() {
 }
 
 export async function getLeadsData() {
-  const { supabase, organization } = await requireOrganization();
+  const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return [];
+  if (schemaIssue) return [];
 
   const { data, error } = await supabase
     .from("leads")
@@ -221,7 +234,10 @@ export async function getLeadsData() {
     .order("updated_at", { ascending: false })
     .limit(200);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isSchemaCacheError(error.message)) return [];
+    throw new Error(error.message);
+  }
 
   return (data ?? []).map((lead): Lead => ({
     id: lead.id,
@@ -241,6 +257,7 @@ export async function getLeadsData() {
 export async function getConversationsData() {
   const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return { conversations: [], selectedConversation: null, schemaIssue };
+  if (schemaIssue) return { conversations: [], selectedConversation: null, schemaIssue };
 
   const { data, error } = await supabase
     .from("conversations")
@@ -251,7 +268,12 @@ export async function getConversationsData() {
     .order("updated_at", { ascending: false })
     .limit(30);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isSchemaCacheError(error.message)) {
+      return { conversations: [], selectedConversation: null, schemaIssue };
+    }
+    throw new Error(error.message);
+  }
 
   const conversations = mapConversations((data ?? []) as ConversationRow[]);
 
@@ -265,6 +287,7 @@ export async function getConversationsData() {
 export async function getAgentData() {
   const { supabase, organization, profile, schemaIssue } = await requireOrganization();
   if (!organization) return { organization: null, profile: null, agent: null, schemaIssue };
+  if (schemaIssue) return { organization, profile: profile ?? null, agent: null, schemaIssue };
 
   const { data: agent, error } = await supabase
     .from("agents")
@@ -275,7 +298,12 @@ export async function getAgentData() {
     .limit(1)
     .maybeSingle();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isSchemaCacheError(error.message)) {
+      return { organization, profile: profile ?? null, agent: null, schemaIssue };
+    }
+    throw new Error(error.message);
+  }
 
   return {
     organization,
@@ -288,6 +316,7 @@ export async function getAgentData() {
 export async function getKnowledgeBaseData() {
   const { supabase, organization, schemaIssue } = await requireOrganization();
   if (!organization) return { organization: null, agent: null, items: [], schemaIssue };
+  if (schemaIssue) return { organization, agent: null, items: [], schemaIssue };
 
   const [{ data: agent, error: agentError }, { data: items, error: itemsError }] = await Promise.all([
     supabase
@@ -304,8 +333,8 @@ export async function getKnowledgeBaseData() {
       .order("updated_at", { ascending: false })
   ]);
 
-  if (agentError) throw new Error(agentError.message);
-  if (itemsError) throw new Error(itemsError.message);
+  if (agentError && !isSchemaCacheError(agentError.message)) throw new Error(agentError.message);
+  if (itemsError && !isSchemaCacheError(itemsError.message)) throw new Error(itemsError.message);
 
   return {
     organization,
@@ -324,6 +353,17 @@ export async function getSettingsData() {
       plan: null,
       integrations: [],
       statuses: buildStatusSummary([], false),
+      schemaIssue
+    };
+  }
+
+  if (schemaIssue) {
+    return {
+      organization,
+      profile: profile ?? null,
+      plan: null,
+      integrations: [],
+      statuses: buildStatusSummary([], Boolean(process.env.OPENAI_API_KEY?.trim())),
       schemaIssue
     };
   }
@@ -485,3 +525,4 @@ function formatTime(value: string) {
 }
 
 export type { AgentRow, KnowledgeBaseRow };
+export { FALLBACK_ORGANIZATION_ID };

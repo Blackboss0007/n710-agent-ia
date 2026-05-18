@@ -2,13 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireOrganization } from "@/lib/dashboard/queries";
+import { FALLBACK_ORGANIZATION_ID, requireOrganization } from "@/lib/dashboard/queries";
 
 export async function completeOnboardingAction(formData: FormData) {
-  const { supabase, organization, user } = await requireOrganization();
+  const { supabase, organization, user, schemaIssue } = await requireOrganization();
 
   if (!organization) {
     redirect("/login");
+  }
+
+  if (schemaIssue || organization.id === FALLBACK_ORGANIZATION_ID) {
+    redirect("/dashboard");
   }
 
   const payload = {

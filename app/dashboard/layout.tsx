@@ -22,24 +22,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const { organization, profile, schemaIssue } = await getTenantContext();
 
-  if (schemaIssue) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-12">
-        <SetupAlert
-          title="Schema do Supabase pendente"
-          description="O usuario autenticou, mas o banco de producao ainda nao tem todas as tabelas esperadas pelo dashboard."
-          missing={[schemaIssue, "Execute supabase/schema.sql no projeto Supabase de producao."]}
-          detailsLabel="Pendencias:"
-        />
-      </main>
-    );
-  }
-
   const onboardingComplete =
     profile?.onboarding_completed ||
     Boolean((organization?.metadata as { onboarding_completed?: boolean } | null)?.onboarding_completed);
 
-  if (!onboardingComplete) {
+  if (!schemaIssue && !onboardingComplete) {
     redirect("/onboarding");
   }
 
@@ -48,7 +35,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar />
       <div className="min-w-0 flex-1">
         <Topbar organizationName={organization?.name ?? "Sem organizacao"} />
-        <main className="p-4 lg:p-6">{children}</main>
+        <main className="p-4 lg:p-6">
+          {schemaIssue ? (
+            <div className="mb-6">
+              <SetupAlert
+                title="Modo inicial do dashboard"
+                description="O dashboard esta funcionando em modo seguro enquanto o schema completo do Supabase ainda nao foi aplicado."
+                missing={[schemaIssue, "Para operacao completa, execute supabase/schema.sql no banco de producao."]}
+                detailsLabel="Observacoes:"
+              />
+            </div>
+          ) : null}
+          {children}
+        </main>
       </div>
     </div>
   );
