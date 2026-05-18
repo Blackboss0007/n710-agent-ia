@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { completeOnboardingAction } from "@/app/onboarding/actions";
+import { SetupAlert } from "@/components/app/setup-alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +16,20 @@ export default async function OnboardingPage() {
     redirect("/login?message=Configure o Supabase antes de concluir o onboarding.");
   }
 
-  const { organization, profile } = await getTenantContext();
+  const { organization, profile, schemaIssue } = await getTenantContext();
+
+  if (schemaIssue) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-4 py-12">
+        <SetupAlert
+          title="Schema do Supabase pendente"
+          description="O onboarding depende das tabelas principais do SaaS. Assim que o schema de producao for executado, esta tela volta a funcionar normalmente."
+          missing={[schemaIssue, "Execute supabase/schema.sql no Supabase de producao."]}
+          detailsLabel="Pendencias:"
+        />
+      </main>
+    );
+  }
 
   if (!organization) {
     redirect("/login");

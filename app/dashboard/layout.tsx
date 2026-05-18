@@ -20,7 +20,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
     );
   }
 
-  const { organization, profile } = await getTenantContext();
+  const { organization, profile, schemaIssue } = await getTenantContext();
+
+  if (schemaIssue) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-4 py-12">
+        <SetupAlert
+          title="Schema do Supabase pendente"
+          description="O usuario autenticou, mas o banco de producao ainda nao tem todas as tabelas esperadas pelo dashboard."
+          missing={[schemaIssue, "Execute supabase/schema.sql no projeto Supabase de producao."]}
+          detailsLabel="Pendencias:"
+        />
+      </main>
+    );
+  }
 
   const onboardingComplete =
     profile?.onboarding_completed ||

@@ -67,6 +67,32 @@ type ConversationRow = {
   }>;
 };
 
+type TenantContext = {
+  supabase: ReturnType<typeof createSupabaseServerClient>;
+  user: { id: string } | null;
+  profile: {
+    id: string;
+    email?: string | null;
+    full_name?: string | null;
+    onboarding_completed?: boolean | null;
+  } | null;
+  organization: Organization | null;
+  role: string | null;
+  schemaIssue: string | null;
+};
+
+function isSchemaCacheError(message?: string | null) {
+  return Boolean(message && /Could not find the table|schema cache/i.test(message));
+}
+
+function normalizeSchemaIssue(message?: string | null) {
+  if (!message) return "Schema do Supabase incompleto para o tenant.";
+  if (message.includes("organization_members")) {
+    return "Tabela public.organization_members ausente no Supabase.";
+  }
+  return message;
+}
+
 export async function getTenantContext() {
   noStore();
   const supabase = createSupabaseServerClient();
@@ -78,18 +104,20 @@ export async function getTenantContext() {
     redirect("/login");
   }
 
-  const [{ data: profile }, { data: membership, error }] = await Promise.all([
+  const [{ data: profile, error: profileError }, { data: membership, error: membershipError }] = await Promise.all([
     supabase.from("profiles").select("id, email, full_name, onboarding_completed").eq("id", user.id).maybeSingle(),
     supabase
-    .from("organization_members")
-    .select("organization_id, role, organizations(id, name, slug, segment, website, whatsapp_phone, metadata)")
-    .eq("profile_id", user.id)
-    .limit(1)
-    .maybeSingle()
+      .from("organization_members")
+      .select("organization_id, role, organizations(id, name, slug, segment, website, whatsapp_phone, metadata)")
+      .eq("profile_id", user.id)
+      .limit(1)
+      .maybeSingle()
   ]);
 
-  if (error) {
-    throw new Error(error.message);
+  const schemaIssue = [profileError?.message, membershipError?.message].find((message) => isSchemaCacheError(message)) ?? null;
+
+  if ((profileError && !isSchemaCacheError(profileError.message)) || (membershipError && !isSchemaCacheError(membershipError.message))) {
+    throw new Error(profileError?.message ?? membershipError?.message);
   }
 
   const organization = Array.isArray(membership?.organizations)
@@ -101,8 +129,9 @@ export async function getTenantContext() {
     user,
     profile: profile ?? null,
     organization: (organization ?? null) as Organization | null,
-    role: membership?.role as string | null
-  };
+    role: membership?.role as string | null,
+    schemaIssue: normalizeSchemaIssue(schemaIssue)
+  } satisfies TenantContext;
 }
 
 export async function requireOrganization() {
@@ -116,10 +145,10 @@ export async function requireOrganization() {
 }
 
 export async function getDashboardData() {
-  const { supabase, organization } = await requireOrganization();
+  const { supabase, organization, schemaIssue } = await requireOrganization();
 
   if (!organization) {
-    return emptyDashboard();
+    return emptyDashboard(schemaIssue);
   }
 
   const orgId = organization.id;
@@ -176,7 +205,8 @@ export async function getDashboardData() {
     },
     agentOnline: Boolean(agent.data?.is_active),
     recentConversations: mapConversations((recentConversations.data ?? []) as ConversationRow[]),
-    performance: buildPerformanceData(revenueRows)
+    performance: buildPerformanceData(revenueRows),
+    schemaIssue
   };
 }
 
@@ -209,8 +239,8 @@ export async function getLeadsData() {
 }
 
 export async function getConversationsData() {
-  const { supabase, organization } = await requireOrganization();
-  if (!organization) return { conversations: [], selectedConversation: null };
+  const { supabase, organization, schemaIssue } = await requireOrganization();
+  if (!organization) return { conversations: [], selectedConversation: null, schemaIssue };
 
   const { data, error } = await supabase
     .from("conversations")
@@ -227,13 +257,14 @@ export async function getConversationsData() {
 
   return {
     conversations,
-    selectedConversation: conversations[0] ?? null
+    selectedConversation: conversations[0] ?? null,
+    schemaIssue
   };
 }
 
 export async function getAgentData() {
-  const { supabase, organization, profile } = await requireOrganization();
-  if (!organization) return { organization: null, profile: null, agent: null };
+  const { supabase, organization, profile, schemaIssue } = await requireOrganization();
+  if (!organization) return { organization: null, profile: null, agent: null, schemaIssue };
 
   const { data: agent, error } = await supabase
     .from("agents")
@@ -249,13 +280,14 @@ export async function getAgentData() {
   return {
     organization,
     profile: profile ?? null,
-    agent: agent as AgentRow | null
+    agent: agent as AgentRow | null,
+    schemaIssue
   };
 }
 
 export async function getKnowledgeBaseData() {
-  const { supabase, organization } = await requireOrganization();
-  if (!organization) return { organization: null, agent: null, items: [] };
+  const { supabase, organization, schemaIssue } = await requireOrganization();
+  if (!organization) return { organization: null, agent: null, items: [], schemaIssue };
 
   const [{ data: agent, error: agentError }, { data: items, error: itemsError }] = await Promise.all([
     supabase
@@ -278,19 +310,21 @@ export async function getKnowledgeBaseData() {
   return {
     organization,
     agent,
-    items: (items ?? []) as KnowledgeBaseRow[]
+    items: (items ?? []) as KnowledgeBaseRow[],
+    schemaIssue
   };
 }
 
 export async function getSettingsData() {
-  const { supabase, organization, profile } = await requireOrganization();
+  const { supabase, organization, profile, schemaIssue } = await requireOrganization();
   if (!organization) {
     return {
       organization: null,
       profile: null,
       plan: null,
       integrations: [],
-      statuses: buildStatusSummary([], false)
+      statuses: buildStatusSummary([], false),
+      schemaIssue
     };
   }
 
@@ -316,7 +350,8 @@ export async function getSettingsData() {
     profile: profile ?? null,
     plan: plan ?? null,
     integrations: integrations ?? [],
-    statuses: buildStatusSummary(integrations ?? [], envOpenAI)
+    statuses: buildStatusSummary(integrations ?? [], envOpenAI),
+    schemaIssue
   };
 }
 
@@ -348,7 +383,12 @@ async function countRows(
   }
 
   const { count, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isSchemaCacheError(error.message)) {
+      return 0;
+    }
+    throw new Error(error.message);
+  }
   return count ?? 0;
 }
 
@@ -407,7 +447,7 @@ function buildPerformanceData(rows: Array<{ potential_value: number | string | n
   return buckets.map(({ key: _key, ...bucket }) => bucket);
 }
 
-function emptyDashboard() {
+function emptyDashboard(schemaIssue: string | null = null) {
   return {
     organization: null,
     metrics: {
@@ -422,7 +462,8 @@ function emptyDashboard() {
     },
     agentOnline: false,
     recentConversations: [],
-    performance: []
+    performance: [],
+    schemaIssue
   };
 }
 

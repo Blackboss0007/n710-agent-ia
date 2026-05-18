@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export function SetupAlert({
   title,
   description,
-  missing
+  missing,
+  detailsLabel = "Variaveis faltando:"
 }: {
   title: string;
   description: string;
   missing: string[];
+  detailsLabel?: string;
 }) {
   return (
     <Card className="mx-auto w-full max-w-2xl">
@@ -21,7 +23,7 @@ export function SetupAlert({
       <CardContent className="space-y-3 text-sm text-muted-foreground">
         <p>{description}</p>
         <div className="rounded-md border border-white/10 bg-white/[0.04] p-3">
-          Variaveis faltando: {missing.join(", ")}
+          {detailsLabel} {missing.join(", ")}
         </div>
       </CardContent>
     </Card>
