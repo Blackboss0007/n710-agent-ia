@@ -50,9 +50,14 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))"
         },
-        gold: "#d9b76f",
+        gold: "#e6c47a",
         violet: "#8b5cf6",
-        graphite: "#111318"
+        cyan: "#4fd1ff",
+        graphite: "#0d1018"
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"]
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -60,16 +65,28 @@ const config = {
         sm: "calc(var(--radius) - 4px)"
       },
       boxShadow: {
-        premium: "0 20px 80px rgba(0,0,0,.45)",
-        glow: "0 0 42px rgba(139,92,246,.25)"
+        premium: "0 24px 80px rgba(0, 0, 0, 0.34)",
+        glow: "0 0 42px rgba(139, 92, 246, 0.22)",
+        glass: "0 12px 50px rgba(4, 8, 20, 0.48)",
+        inset: "inset 0 1px 0 rgba(255,255,255,0.06)"
       },
       animation: {
-        "fade-up": "fade-up .55s ease-out both"
+        "fade-up": "fade-up .55s ease-out both",
+        "pulse-line": "pulse-line 3.4s ease-in-out infinite",
+        float: "float 7s ease-in-out infinite"
       },
       keyframes: {
         "fade-up": {
           "0%": { opacity: "0", transform: "translateY(14px)" },
           "100%": { opacity: "1", transform: "translateY(0)" }
+        },
+        "pulse-line": {
+          "0%, 100%": { opacity: "0.45" },
+          "50%": { opacity: "1" }
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" }
         }
       }
     }

@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
+import { ArrowRight, LockKeyhole, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -52,19 +52,19 @@ export function AuthCard({
       isRecoveryFlow
         ? await supabase.auth.updateUser({ password })
         : mode === "login"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : mode === "register"
-          ? await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                data: { name },
-                emailRedirectTo: `${origin}/api/auth/callback`
-              }
-            })
-          : await supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: `${origin}/reset-password`
-            });
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : mode === "register"
+            ? await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                  data: { name },
+                  emailRedirectTo: `${origin}/api/auth/callback`
+                }
+              })
+            : await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${origin}/reset-password`
+              });
 
     setLoading(false);
 
@@ -96,13 +96,17 @@ export function AuthCard({
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-[440px] border-white/12 bg-[linear-gradient(180deg,rgba(20,24,36,0.92),rgba(11,14,24,0.9))]">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-primary shadow-glow">
-          <Sparkles className="h-5 w-5" />
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md border border-primary/30 bg-primary/20 shadow-glow">
+          <Sparkles className="h-5 w-5 text-white" />
         </div>
-        <CardTitle className="text-2xl">{title}</CardTitle>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="mx-auto mb-4 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/65">
+          <ShieldCheck className="h-3.5 w-3.5 text-cyan" />
+          acesso seguro
+        </div>
+        <CardTitle className="text-3xl">{title}</CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">{description}</p>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -119,10 +123,17 @@ export function AuthCard({
           {mode !== "reset" || isRecoveryFlow ? (
             <div className="space-y-2">
               <Label>{isRecoveryFlow ? "Nova senha" : "Senha"}</Label>
-              <Input value={password} onChange={(event) => setPassword(event.target.value)} type="password" placeholder={isRecoveryFlow ? "Defina sua nova senha" : "Sua senha"} required minLength={6} />
+              <Input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                type="password"
+                placeholder={isRecoveryFlow ? "Defina sua nova senha" : "Sua senha"}
+                required
+                minLength={6}
+              />
             </div>
           ) : null}
-          <Button className="w-full" type="submit" disabled={loading || !envStatus.ok}>
+          <Button className="w-full" size="lg" type="submit" disabled={loading || !envStatus.ok}>
             {loading
               ? "Processando..."
               : mode === "login"
@@ -132,6 +143,7 @@ export function AuthCard({
                   : isRecoveryFlow
                     ? "Salvar nova senha"
                     : "Enviar recuperacao"}
+            {!loading ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
           </Button>
         </form>
         {message ? <p className="mt-4 rounded-md border border-white/10 bg-white/[0.04] p-3 text-sm text-muted-foreground">{message}</p> : null}
@@ -140,15 +152,36 @@ export function AuthCard({
             Faltam variaveis obrigatorias: {envStatus.missing.join(", ")}.
           </p>
         ) : null}
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="surface-muted px-4 py-3 text-left">
+            <p className="text-xs uppercase tracking-[0.16em] text-white/45">tempo medio</p>
+            <p className="mt-2 text-lg font-semibold text-white">23s</p>
+            <p className="mt-1 text-xs text-muted-foreground">primeira resposta do agente</p>
+          </div>
+          <div className="surface-muted px-4 py-3 text-left">
+            <p className="text-xs uppercase tracking-[0.16em] text-white/45">camada</p>
+            <p className="mt-2 flex items-center gap-2 text-lg font-semibold text-white">
+              <LockKeyhole className="h-4 w-4 text-cyan" />
+              auth + tenant
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Supabase SSR protegido</p>
+          </div>
+        </div>
         <div className="mt-5 text-center text-sm text-muted-foreground">
           {mode === "login" ? (
             <>
-              <Link className="text-violet hover:underline" href="/reset-password">Esqueci minha senha</Link>
+              <Link className="text-violet hover:underline" href="/reset-password">
+                Esqueci minha senha
+              </Link>
               <span className="mx-2">•</span>
-              <Link className="text-violet hover:underline" href="/register">Criar conta</Link>
+              <Link className="text-violet hover:underline" href="/register">
+                Criar conta
+              </Link>
             </>
           ) : (
-            <Link className="text-violet hover:underline" href="/login">Voltar para login</Link>
+            <Link className="text-violet hover:underline" href="/login">
+              Voltar para login
+            </Link>
           )}
         </div>
       </CardContent>

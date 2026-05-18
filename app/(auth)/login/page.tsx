@@ -12,7 +12,7 @@ export default async function LoginPage({
     <div className="mx-auto flex justify-center">
       <AuthCard
         title="Entrar no N710"
-        description="Acesse seu painel comercial de IA."
+        description="Acesse sua operacao comercial com IA, dashboards ao vivo e automacoes de atendimento."
         mode="login"
         nextPath={searchParams?.next}
         initialMessage={searchParams?.message}

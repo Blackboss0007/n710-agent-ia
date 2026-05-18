@@ -12,7 +12,7 @@ export default async function ResetPasswordPage({
     <div className="mx-auto flex justify-center">
       <AuthCard
         title="Recuperar senha"
-        description="Receba um link seguro para redefinir seu acesso."
+        description="Receba um link seguro para redefinir seu acesso e voltar ao painel sem atrito."
         mode="reset"
         initialMessage={searchParams?.message}
         recoveryMode={searchParams?.type === "recovery"}

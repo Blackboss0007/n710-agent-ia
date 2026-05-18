@@ -36,7 +36,8 @@ export function KnowledgeBaseEditor({
     <div className="grid gap-5 xl:grid-cols-[1fr_380px]">
       <Card>
         <CardHeader>
-          <CardTitle>Base de Conhecimento</CardTitle>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/40">memory editor</p>
+          <CardTitle className="mt-2 text-2xl">Base de conhecimento</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={saveKnowledgeBaseAction} className="grid gap-4">
@@ -79,7 +80,7 @@ export function KnowledgeBaseEditor({
               <div className="mt-2 divide-y divide-white/10 rounded-md border border-white/10">
                 {qaItems.map((item) => (
                   <div key={item.id} className="p-3">
-                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="text-sm font-medium text-white">{item.title}</p>
                     <p className="mt-1 text-xs text-muted-foreground">{item.content}</p>
                   </div>
                 ))}
@@ -91,14 +92,15 @@ export function KnowledgeBaseEditor({
 
       <Card>
         <CardHeader>
-          <CardTitle>Upload de documentos</CardTitle>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/40">private docs</p>
+          <CardTitle className="mt-2 text-2xl">Upload de documentos</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={uploadKnowledgeDocumentAction} className="flex min-h-60 flex-col items-center justify-center rounded-lg border border-dashed border-white/15 bg-white/[0.03] p-6 text-center">
             <input type="hidden" name="agent_id" value={agentId ?? ""} />
-            <FileUp className="mb-3 h-9 w-9 text-violet" />
-            <p className="font-medium">Enviar PDFs, DOCX ou TXT</p>
-            <p className="mt-1 text-sm text-muted-foreground">Os arquivos sao salvos no Supabase Storage privado e vinculados a organizacao.</p>
+            <FileUp className="mb-3 h-9 w-9 text-cyan" />
+            <p className="font-medium text-white">Enviar PDFs, DOCX ou TXT</p>
+            <p className="mt-1 text-sm text-muted-foreground">Os arquivos ficam no Supabase Storage privado e vinculados a organizacao.</p>
             <Input className="mt-5" name="file" type="file" accept=".pdf,.txt,.md,.docx" />
             <Button className="mt-4" type="submit" variant="gold">
               Enviar documento
@@ -106,7 +108,7 @@ export function KnowledgeBaseEditor({
           </form>
           {documentItems.length > 0 ? (
             <div className="mt-5 space-y-2">
-              <p className="text-sm font-medium">Documentos enviados</p>
+              <p className="text-sm font-medium text-white">Documentos enviados</p>
               {documentItems.map((item) => (
                 <div key={item.id} className="rounded-md border border-white/10 bg-white/[0.03] p-3 text-sm">
                   <p>{item.title}</p>

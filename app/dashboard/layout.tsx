@@ -33,9 +33,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <div className="min-w-0 flex-1">
-        <Topbar organizationName={organization?.name ?? "Sem organizacao"} />
-        <main className="p-4 lg:p-6">{children}</main>
+      <div className="relative min-w-0 flex-1">
+        <div className="pointer-events-none absolute inset-0 dashboard-grid opacity-50" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,rgba(115,81,255,0.16),transparent)]" />
+        <div className="relative">
+          <Topbar organizationName={organization?.name ?? "Sem organizacao"} />
+          <main className="p-4 pb-24 lg:p-8">{children}</main>
+        </div>
       </div>
     </div>
   );

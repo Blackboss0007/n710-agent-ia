@@ -34,10 +34,15 @@ export default async function IntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold">Integracoes</h1>
-        <p className="text-muted-foreground">Status de conexao e instrucoes objetivas para configuracao em producao.</p>
-      </div>
+      <section className="hero-outline rounded-lg px-6 py-8">
+        <div className="max-w-3xl">
+          <div className="eyebrow-chip">connectivity layer</div>
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white">Integracoes</h1>
+          <p className="mt-4 text-base leading-8 text-muted-foreground">
+            Visibilidade do que esta conectado, do que ainda falta e do caminho mais curto para deixar a operacao completa.
+          </p>
+        </div>
+      </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {cards.map((integration) => (
@@ -47,7 +52,8 @@ export default async function IntegrationsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Instrucoes</CardTitle>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/40">playbook</p>
+          <CardTitle className="mt-2 text-2xl">Instrucoes</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>Supabase: configure Auth URLs, rode `supabase/schema.sql` e preencha as chaves no ambiente.</p>

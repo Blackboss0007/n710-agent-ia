@@ -14,7 +14,8 @@ export function AgentConfigForm({ agent, organizationName }: { agent: AgentRow |
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Configuracao do Agente IA</CardTitle>
+        <p className="text-xs uppercase tracking-[0.18em] text-white/40">agent configuration</p>
+        <CardTitle className="mt-2 text-2xl">Configuracao do agente IA</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={saveAgentAction} className="grid gap-5">
@@ -31,12 +32,12 @@ export function AgentConfigForm({ agent, organizationName }: { agent: AgentRow |
               defaultValue={agent?.initial_message ?? `Ola! Sou o assistente da ${organizationName}. Como posso te ajudar?`}
             />
           </div>
-          <Area name="products_services" label="Produtos/servicos" defaultValue={agent?.products_services ?? ""} />
+          <Area name="products_services" label="Produtos e servicos" defaultValue={agent?.products_services ?? ""} />
           <Area name="common_objections" label="Objecoes comuns" defaultValue={agent?.common_objections ?? ""} />
           <Area name="forbidden_answers" label="Respostas proibidas" defaultValue={agent?.forbidden_answers ?? ""} />
           <Area name="human_handoff_rules" label="Quando chamar humano" defaultValue={agent?.human_handoff_rules ?? ""} />
           <Area name="custom_prompt" label="Prompt personalizado" defaultValue={agent?.custom_prompt ?? BASE_AGENT_PROMPT} />
-          <label className="flex items-center gap-3 text-sm text-muted-foreground">
+          <label className="flex items-center gap-3 rounded-md border border-white/10 bg-white/[0.03] px-4 py-4 text-sm text-muted-foreground">
             <input
               type="checkbox"
               name="is_active"

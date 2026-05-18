@@ -1,11 +1,10 @@
 import { redirect } from "next/navigation";
 import { completeOnboardingAction } from "@/app/onboarding/actions";
-import { SetupAlert } from "@/components/app/setup-alert";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { getTenantContext } from "@/lib/dashboard/queries";
 import { getPublicEnvStatus } from "@/lib/env/public";
 
@@ -35,17 +34,21 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <main className="container max-w-4xl py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold">Onboarding</h1>
-        <p className="mt-2 text-muted-foreground">
-          Configure sua empresa e o agente de IA para liberar o painel operacional.
-        </p>
-      </div>
+    <main className="container max-w-5xl py-12">
+      <section className="hero-outline rounded-lg px-6 py-8 md:px-8">
+        <div className="max-w-3xl">
+          <div className="eyebrow-chip">onboarding sequence</div>
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white">Configure sua operacao inicial</h1>
+          <p className="mt-4 text-base leading-8 text-muted-foreground">
+            Defina a identidade comercial da empresa e libere o painel com um agente IA pronto para atender com contexto.
+          </p>
+        </div>
+      </section>
 
-      <Card>
+      <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Configuracao inicial</CardTitle>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/40">setup</p>
+          <CardTitle className="mt-2 text-2xl">Configuracao inicial</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={completeOnboardingAction} className="grid gap-5">
@@ -62,7 +65,11 @@ export default async function OnboardingPage() {
 
             <Area name="products_services" label="Servicos e produtos" defaultValue="" />
             <Area name="common_objections" label="Objecoes comuns" defaultValue="" />
-            <Area name="initial_message" label="Mensagem inicial" defaultValue={`Ola! Sou o agente da ${organization.name}. Como posso te ajudar hoje?`} />
+            <Area
+              name="initial_message"
+              label="Mensagem inicial"
+              defaultValue={`Ola! Sou o agente da ${organization.name}. Como posso te ajudar hoje?`}
+            />
 
             <div>
               <Button type="submit">Finalizar onboarding</Button>

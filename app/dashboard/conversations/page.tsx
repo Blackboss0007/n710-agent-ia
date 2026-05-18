@@ -7,12 +7,17 @@ export default async function ConversationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold">Conversas</h1>
-        <p className="text-muted-foreground">Historico completo, resumo IA, tags e controle humano com mensagens reais.</p>
-      </div>
+      <section className="hero-outline rounded-lg px-6 py-8">
+        <div className="max-w-3xl">
+          <div className="eyebrow-chip">conversation intelligence</div>
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white">Conversas</h1>
+          <p className="mt-4 text-base leading-8 text-muted-foreground">
+            Threads, resumos de IA, tags e takeover humano em uma interface feita para leitura rapida e decisao.
+          </p>
+        </div>
+      </section>
       <div className="grid gap-5 xl:grid-cols-[390px_1fr]">
-        <ConversationList conversations={conversations} title="Conversas" />
+        <ConversationList conversations={conversations} title="Fila priorizada" />
         <ChatWindow conversation={selectedConversation} />
       </div>
     </div>

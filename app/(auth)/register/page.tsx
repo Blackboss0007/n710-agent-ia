@@ -12,7 +12,7 @@ export default async function RegisterPage({
     <div className="mx-auto flex justify-center">
       <AuthCard
         title="Criar conta"
-        description="Configure sua organizacao e comece a treinar seu agente."
+        description="Ative sua organizacao, conecte seu contexto comercial e lance seu primeiro agente IA."
         mode="register"
         initialMessage={searchParams?.message}
       />

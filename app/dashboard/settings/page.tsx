@@ -13,14 +13,20 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold">Configuracoes</h1>
-        <p className="text-muted-foreground">Dados da empresa, plano atual, status das integracoes e logout.</p>
-      </div>
+      <section className="hero-outline rounded-lg px-6 py-8">
+        <div className="max-w-3xl">
+          <div className="eyebrow-chip">workspace settings</div>
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white">Configuracoes</h1>
+          <p className="mt-4 text-base leading-8 text-muted-foreground">
+            Dados da empresa, plano atual, status das integracoes e controles de acesso em uma camada mais institucional.
+          </p>
+        </div>
+      </section>
 
       <Card>
         <CardHeader>
-          <CardTitle>Organizacao</CardTitle>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/40">organization</p>
+          <CardTitle className="mt-2 text-2xl">Organizacao</CardTitle>
         </CardHeader>
         <CardContent>
           <form action={saveSettingsAction} className="grid gap-4 md:grid-cols-2">
@@ -53,12 +59,13 @@ export default async function SettingsPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Plano atual</CardTitle>
+            <p className="text-xs uppercase tracking-[0.18em] text-white/40">billing</p>
+            <CardTitle className="mt-2 text-2xl">Plano atual</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Plano</span>
-              <span>{plan?.plan ?? "starter"}</span>
+              <span className="text-white">{plan?.plan ?? "starter"}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Status</span>
@@ -69,7 +76,8 @@ export default async function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Status tecnico</CardTitle>
+            <p className="text-xs uppercase tracking-[0.18em] text-white/40">infra health</p>
+            <CardTitle className="mt-2 text-2xl">Status tecnico</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <StatusRow label="Supabase" tone="connected" value={statuses.supabase} />
@@ -82,7 +90,8 @@ export default async function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Acesso</CardTitle>
+          <p className="text-xs uppercase tracking-[0.18em] text-white/40">access</p>
+          <CardTitle className="mt-2 text-2xl">Acesso</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Button variant="outline" asChild>
