@@ -35,19 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar />
       <div className="min-w-0 flex-1">
         <Topbar organizationName={organization?.name ?? "Sem organizacao"} />
-        <main className="p-4 lg:p-6">
-          {schemaIssue ? (
-            <div className="mb-6">
-              <SetupAlert
-                title="Modo inicial do dashboard"
-                description="O dashboard esta funcionando em modo seguro enquanto o schema completo do Supabase ainda nao foi aplicado."
-                missing={[schemaIssue, "Para operacao completa, execute supabase/schema.sql no banco de producao."]}
-                detailsLabel="Observacoes:"
-              />
-            </div>
-          ) : null}
-          {children}
-        </main>
+        <main className="p-4 lg:p-6">{children}</main>
       </div>
     </div>
   );
