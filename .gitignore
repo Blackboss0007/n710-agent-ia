@@ -6,6 +6,14 @@ node_modules
 .env*.local
 .vercel
 .DS_Store
+.tmp-chrome-profile*
+.tmp-edge-profile*
+supabase-editor-*.png
+supabase-editor-dump.txt
+supabase-schema-*.png
+lighthouse-*.json
 dist
 coverage
 *.tsbuildinfo
+
+.vercel
